@@ -1,10 +1,11 @@
 import axios from 'axios';
 import { promises as fs } from 'fs';
 import path = require('path');
-import { writer } from 'repl';
-import { DriversParameterBuilder } from '../drivers-parameter-builder';
-import { DeviceEntry } from './device-entry.interface';
-import { PaginatedResult } from './paginated-result.interface';
+import { DriversParameterBuilder } from './drivers-parameter-builder';
+import { DeviceEntry } from './api-models/device-entry.interface';
+import { PaginatedResult } from './api-models/paginated-result.interface';
+
+const TIMEOUT_MS = 5000;
 
 export class IoddFinderApi {
   static readonly apiBaseUrl = 'https://ioddfinder.io-link.com/api';
@@ -50,7 +51,7 @@ export class IoddFinderApi {
   }
 
   private static async get<T>(url: string, params?: any): Promise<T> {
-    const result = await axios.get<T>(url, { params });
+    const result = await axios.get<T>(url, { params, timeout: TIMEOUT_MS });
 
     if (result.status >= 300) {
       throw new Error(`Received non success status code ${result.status}`);

@@ -1,5 +1,5 @@
 import { Command } from '@oclif/core';
-import { IoddFinderApi } from '../../logic/api-models/ioddfinder-api';
+import { IoddFinderApi } from '../../logic/ioddfinder-api';
 
 export default class World extends Command {
   static description = 'Obtain a list of available vendors.';

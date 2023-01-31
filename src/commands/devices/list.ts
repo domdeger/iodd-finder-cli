@@ -1,5 +1,5 @@
 import { Args, Command, Flags, ux } from '@oclif/core';
-import { IoddFinderApi } from '../../logic/api-models/ioddfinder-api';
+import { IoddFinderApi } from '../../logic/ioddfinder-api';
 import 'core-js/full/array/from-async';
 import { DeviceEntry } from '../../logic/api-models/device-entry.interface';
 
