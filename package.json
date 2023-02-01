@@ -21,7 +21,8 @@
     "@oclif/plugin-help": "^5",
     "@oclif/plugin-plugins": "^2.2.2",
     "axios": "^1.2.4",
-    "core-js": "^3.27.2"
+    "core-js": "^3.27.2",
+    "delay": "^5.0.0"
   },
   "devDependencies": {
     "@oclif/test": "^2.3.3",

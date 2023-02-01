@@ -31,7 +31,10 @@ export class IoddFinderApi {
       .replace('filename=', '')
       .trim();
 
+    await fs.mkdir(folder, { recursive: true });
     await fs.writeFile(path.join(folder, filename), result.data);
+
+    return filename;
   }
 
   public static async *GetDevicesForVendor(vendorName: string): AsyncGenerator<DeviceEntry> {
