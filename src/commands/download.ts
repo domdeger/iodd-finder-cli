@@ -1,5 +1,5 @@
-import { Args, Command, Flags } from '@oclif/core';
-import { AxiosError } from 'axios';
+import { Args, Command, Flags, ux } from '@oclif/core';
+import delay = require('delay');
 import { printError } from '../logic/error-handling';
 import { IoddFinderApi } from '../logic/ioddfinder-api';
 
@@ -21,20 +21,31 @@ export default class Download extends Command {
 
   async run(): Promise<void> {
     const { flags } = await this.parse(Download);
-    try {
-    } catch (e) {
-      printError(e, this);
-    }
+
     if (flags.vendor) {
       const vendorName = flags.vendor;
 
       for await (let device of IoddFinderApi.GetDevicesForVendor(vendorName)) {
-        await IoddFinderApi.DownloadIoddRated('', device.vendorId, device.ioddId);
+        try {
+          ux.action.start(`Downloading iodd for device Id ${device.deviceId}`, 'downloading');
+          const fileName = await IoddFinderApi.DownloadIoddRated('./out', device.vendorId, device.ioddId);
+          const delayMs = this.getRndDelay();
+
+          ux.action.start(`Delaying for ${delayMs} ms`);
+
+          await delay(delayMs);
+        } catch (e) {
+          printError(e, this);
+        }
       }
     }
     const vendors = await IoddFinderApi.getVendorList();
     for (const vendor of vendors) {
       this.log(vendor);
     }
+  }
+
+  getRndDelay() {
+    return Math.floor(Math.random() * 10000);
   }
 }
