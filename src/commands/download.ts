@@ -1,7 +1,9 @@
 import { Args, Command, Flags, ux } from '@oclif/core';
 import delay = require('delay');
+import { DeviceEntry } from '../logic/api-models/device-entry.interface';
 import { printError } from '../logic/error-handling';
 import { IoddFinderApi } from '../logic/ioddfinder-api';
+import { toArrayAsync } from '../logic/tools';
 
 export default class Download extends Command {
   static description = 'Download iodds';
@@ -25,14 +27,22 @@ export default class Download extends Command {
     if (flags.vendor) {
       const vendorName = flags.vendor;
 
-      for await (let device of IoddFinderApi.GetDevicesForVendor(vendorName)) {
+      const devices = await toArrayAsync(IoddFinderApi.GetDevicesForVendor(vendorName));
+      const downloadedIodds: number[] = [];
+      let processedCount = 0;
+      for (let device of devices) {
         try {
-          ux.action.start(`Downloading iodd for device Id ${device.deviceId}`, 'downloading');
+          processedCount++;
+          if (downloadedIodds.includes(device.ioddId)) {
+            continue;
+          }
+
+          ux.action.start(`Downloading iodd for device Id ${device.deviceId} ${processedCount}/${devices.length}`);
           const fileName = await IoddFinderApi.DownloadIoddRated('./out', device.vendorId, device.ioddId);
+          ux.log(`Downloaded iodd file ${fileName}`);
+          downloadedIodds.push(device.ioddId);
+
           const delayMs = this.getRndDelay();
-
-          ux.action.start(`Delaying for ${delayMs} ms`);
-
           await delay(delayMs);
         } catch (e) {
           printError(e, this);
@@ -46,6 +56,6 @@ export default class Download extends Command {
   }
 
   getRndDelay() {
-    return Math.floor(Math.random() * 10000);
+    return Math.floor(5000 + Math.random() * 3000);
   }
 }
